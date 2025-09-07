@@ -32,9 +32,10 @@ func TestHandlers(t *testing.T) {
 		handler.MainHandler(response, request)
 
 		result := response.Result()
+		defer result.Body.Close()
 
 		if result.StatusCode != http.StatusTemporaryRedirect {
-			t.Errorf("got %v, want %v", response.Result().Status, http.StatusCreated)
+			t.Errorf("got %v, want %v", response.Result().Status, http.StatusTemporaryRedirect)
 		}
 
 		if result.Header.Get("Location") != location {
