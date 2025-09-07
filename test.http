@@ -1,0 +1,12 @@
+### GET request to example server
+POST http://127.0.0.1:8080
+
+https://yandex.ru
+
+###
+// @no-redirect
+// @no-log
+// @no-cookie-jar
+GET http://127.0.0.1:8080/HEqg0CSqVPzzz
+
+
