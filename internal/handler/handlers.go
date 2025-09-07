@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ func mainHandlerActionPost(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 
-	_, err = res.Write([]byte("http:" + req.Host + "/" + shortURL))
+	_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s", req.Host, shortURL)))
 	if err != nil {
 		log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
 		http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)

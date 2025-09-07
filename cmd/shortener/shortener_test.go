@@ -15,9 +15,10 @@ func TestHandlers(t *testing.T) {
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
 		response := httptest.NewRecorder()
 		handler.MainHandler(response, request)
-
-		if response.Result().StatusCode != http.StatusCreated {
-			t.Errorf("got %v, want %v", response.Result().Status, http.StatusCreated)
+		result := response.Result()
+		defer result.Body.Close()
+		if result.StatusCode != http.StatusCreated {
+			t.Errorf("got %v, want %v", result.Status, http.StatusCreated)
 		}
 
 	})
@@ -27,7 +28,7 @@ func TestHandlers(t *testing.T) {
 		location := "http://example.com/page"
 		(*repository.MapShorts())[key] = location
 
-		request, _ := http.NewRequest("GET", "/newCode123", nil)
+		request, _ := http.NewRequest("GET", "/"+key, nil)
 		response := httptest.NewRecorder()
 		handler.MainHandler(response, request)
 
