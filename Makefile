@@ -14,4 +14,4 @@ build:
 	go build  -o $(SHORTAINER_BIN)  cmd/shortener/shoratiner.go
 
 autotest:
-	./shortenertest -test.v -test.run=^TestIteration1$ -binary-path=$(SHORTAINER_BIN)
+	go test -v ./cmd/*
