@@ -10,14 +10,14 @@ import (
 )
 
 func mainHandlerActionGet(res http.ResponseWriter, req *http.Request) {
-	longUrl, ok := (*repository.MapShorts())[req.RequestURI[1:]]
+	longURL, ok := (*repository.MapShorts())[req.RequestURI[1:]]
 	if !ok {
-		log.Printf("Unable to find longUrl URL for short: %s: status: %d", req.RequestURI[1:], http.StatusBadRequest)
-		http.Error(res, "Unable to find longUrl URL for short", http.StatusBadRequest)
+		log.Printf("Unable to find longURL URL for short: %s: status: %d", req.RequestURI[1:], http.StatusBadRequest)
+		http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
 	}
 
 	log.Println("Map of short links: ", repository.MapShorts())
-	res.Header().Add("Location", longUrl)
+	res.Header().Add("Location", longURL)
 
 	res.WriteHeader(http.StatusTemporaryRedirect)
 	log.Println("Full header: ", res.Header())
@@ -32,7 +32,7 @@ func mainHandlerActionPost(res http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close()
 
-	shortUrl, err := service.ShortURL(body)
+	shortURL, err := service.ShortURL(body)
 	if err != nil {
 		log.Printf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 		http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
@@ -40,7 +40,7 @@ func mainHandlerActionPost(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 
-	_, err = res.Write([]byte("http://" + req.Host + "/" + shortUrl))
+	_, err = res.Write([]byte("http://" + req.Host + "/" + shortURL))
 	if err != nil {
 		log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
 		http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)

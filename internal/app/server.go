@@ -15,7 +15,7 @@ func StartServer() {
 	mux.HandleFunc("/", handler.MainHandler)
 
 	serverPath := fmt.Sprintf("%s:%d", config.AppHost, config.AppPort)
-	log.Println(fmt.Sprintf("Starting server on: http://%s", serverPath))
+	log.Printf("Starting server on: http://%s", serverPath)
 
 	if err := http.ListenAndServe(serverPath, mux); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("HTTP server error: %v", err)
