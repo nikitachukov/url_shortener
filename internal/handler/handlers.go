@@ -10,10 +10,11 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
-func mainHandlerActionGet(res http.ResponseWriter, req *http.Request) {
-	longURL, ok := (*repository.MapShorts())[req.URL.Path[1:]]
+func ActionGet(res http.ResponseWriter, req *http.Request) {
+	shortParam := req.URL.Path[1:]
+	longURL, ok := (*repository.MapShorts())[shortParam]
 	if !ok {
-		log.Printf("Unable to find longURL URL for short: %s: status: %d", req.URL.Path[1:], http.StatusBadRequest)
+		log.Printf("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
 		http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
 	}
 
@@ -25,7 +26,7 @@ func mainHandlerActionGet(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func mainHandlerActionPost(res http.ResponseWriter, req *http.Request) {
+func ActionPost(res http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Unable to read body: status: %d", http.StatusBadRequest)
@@ -45,23 +46,6 @@ func mainHandlerActionPost(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
 		http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
-	}
-
-}
-
-func MainHandler(res http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-
-	case http.MethodPost:
-		mainHandlerActionPost(res, req)
-
-	case http.MethodGet:
-		mainHandlerActionGet(res, req)
-
-	default:
-		log.Printf("Method not implemented: %s, status: %d", req.Method, http.StatusNotImplemented)
-		http.Error(res, "BadRequest", http.StatusBadRequest)
-
 	}
 
 }

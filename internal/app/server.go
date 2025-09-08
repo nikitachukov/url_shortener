@@ -9,11 +9,18 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
+	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
 func StartServer() {
+
+	key := "newCode123"
+	location := "http://example.com/page"
+	(*repository.MapShorts())[key] = location
+
 	mux := chi.NewRouter()
-	mux.HandleFunc("/", handler.MainHandler)
+	mux.Post("/", handler.ActionPost)
+	mux.Get("/{short}", handler.ActionGet)
 
 	serverPath := fmt.Sprintf("%s:%d", config.AppHost, config.AppPort)
 	log.Printf("Starting server on: http://%s", serverPath)

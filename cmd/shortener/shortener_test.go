@@ -14,7 +14,7 @@ func TestHandlers(t *testing.T) {
 	t.Run("test POST", func(t *testing.T) {
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
 		response := httptest.NewRecorder()
-		handler.MainHandler(response, request)
+		handler.ActionPost(response, request)
 		result := response.Result()
 		defer result.Body.Close()
 		if result.StatusCode != http.StatusCreated {
@@ -24,13 +24,14 @@ func TestHandlers(t *testing.T) {
 	})
 
 	t.Run("test GET", func(t *testing.T) {
+
 		key := "newCode123"
 		location := "http://example.com/page"
 		(*repository.MapShorts())[key] = location
 
 		request, _ := http.NewRequest("GET", "/"+key, nil)
 		response := httptest.NewRecorder()
-		handler.MainHandler(response, request)
+		handler.ActionGet(response, request)
 
 		result := response.Result()
 		defer result.Body.Close()
