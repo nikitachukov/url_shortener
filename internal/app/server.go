@@ -2,7 +2,6 @@ package router
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -23,7 +22,7 @@ func StartServer() {
 	Mux.Post("/", handler.ActionPost)
 	Mux.Get("/"+*config.BasePath+"/{short}", handler.ActionGet)
 
-	serverPath := fmt.Sprintf("%s", *config.AppAddr)
+	serverPath := *config.AppAddr
 	log.Printf("Starting server on: http://%s", serverPath)
 
 	if err := http.ListenAndServe(serverPath, Mux); !errors.Is(err, http.ErrServerClosed) {
