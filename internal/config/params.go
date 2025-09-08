@@ -10,7 +10,7 @@ var (
 )
 
 func ParseParams() {
-	AppAddr = flag.String("a", "localhost:8888", "адрес запуска HTTP-сервера")
+	AppAddr = flag.String("a", "localhost:8080", "адрес запуска HTTP-сервера")
 	BasePath = flag.String("b", "", "базовый адрес результирующего сокращённого URL")
 	flag.Parse()
 }
