@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 GOTOOLCHAIN=go1.24.5
-SHORTAINER_BIN=bin/shoratiner
+SHORTENER_BIN=bin/shortener
 
 all: clean prep build autotest
 
@@ -11,7 +11,10 @@ prep:
 	GOTOOLCHAIN=$(GOTOOLCHAIN) go mod tidy
 
 build:
-	go build  -o $(SHORTAINER_BIN)  cmd/shortener/shoratiner.go
+	go build  -o $(SHORTENER_BIN) cmd/shortener/shortener.go
 
 autotest:
 	go test -v ./cmd/*
+
+at:
+	 ./shortenertest -test.v -test.run=^TestIteration1$ -binary-path=$(SHORTENER_BIN)
