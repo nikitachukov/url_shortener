@@ -1,12 +1,14 @@
-### GET request to example server
+### post url for short
 POST http://127.0.0.1:8080
 
-https://gopnik.win/2
+https://gopnik.win/zzz
 
-###
+> {%
+    client.global.set("rawBody", response.body);
+%}
+
+### get short url and redirect
 // @no-redirect
 // @no-log
 // @no-cookie-jar
-GET http://127.0.0.1:8080/pBdlC4pogO
-
-
+GET {{rawBody}}
