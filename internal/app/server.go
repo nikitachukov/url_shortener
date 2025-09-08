@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
 )
 
 func StartServer() {
-	mux := http.NewServeMux()
+	mux := chi.NewRouter()
 	mux.HandleFunc("/", handler.MainHandler)
 
 	serverPath := fmt.Sprintf("%s:%d", config.AppHost, config.AppPort)
