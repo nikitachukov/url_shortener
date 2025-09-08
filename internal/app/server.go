@@ -20,7 +20,12 @@ func StartServer() {
 
 	Mux := chi.NewRouter()
 	Mux.Post("/", handler.ActionPost)
-	Mux.Get("/"+*config.BasePath+"/{short}", handler.ActionGet)
+
+	if *config.BasePath != "" {
+		Mux.Get("/"+*config.BasePath+"/{short}", handler.ActionGet)
+	} else {
+		Mux.Get("/{short}", handler.ActionGet)
+	}
 
 	serverPath := *config.AppAddr
 	log.Printf("Starting server on: http://%s", serverPath)
