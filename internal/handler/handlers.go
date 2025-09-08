@@ -6,12 +6,19 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
 func ActionGet(res http.ResponseWriter, req *http.Request) {
-	shortParam := req.URL.Path[1:]
+
+	shortParam := chi.URLParam(req, "short")
+	if shortParam == "" {
+		shortParam = req.URL.Path[1:]
+	}
+
 	longURL, ok := (*repository.MapShorts())[shortParam]
 	if !ok {
 		log.Printf("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
@@ -41,8 +48,11 @@ func ActionPost(res http.ResponseWriter, req *http.Request) {
 	}
 
 	res.WriteHeader(http.StatusCreated)
-
-	_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s", req.Host, shortURL)))
+	if *config.BasePath == "" {
+		_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s", req.Host, shortURL)))
+	} else {
+		_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s/%s", req.Host, *config.BasePath, shortURL)))
+	}
 	if err != nil {
 		log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
 		http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)

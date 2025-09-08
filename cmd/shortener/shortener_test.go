@@ -6,12 +6,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
 func TestHandlers(t *testing.T) {
 	t.Run("test POST", func(t *testing.T) {
+		config.ParseParams()
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
 		response := httptest.NewRecorder()
 		handler.ActionPost(response, request)
@@ -24,7 +26,6 @@ func TestHandlers(t *testing.T) {
 	})
 
 	t.Run("test GET", func(t *testing.T) {
-
 		key := "newCode123"
 		location := "http://example.com/page"
 		(*repository.MapShorts())[key] = location

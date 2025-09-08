@@ -1,6 +1,16 @@
 package config
 
-var (
-	AppHost = "127.0.0.1"
-	AppPort = 8080
+import (
+	"flag"
 )
+
+var (
+	AppAddr  *string
+	BasePath *string
+)
+
+func ParseParams() {
+	AppAddr = flag.String("a", "localhost:8888", "адрес запуска HTTP-сервера")
+	BasePath = flag.String("b", "", "базовый адрес результирующего сокращённого URL")
+	flag.Parse()
+}
