@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
-	"github.com/nikitachukov/url_shortener.git/internal/repository"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
@@ -19,13 +18,13 @@ func ActionGet(res http.ResponseWriter, req *http.Request) {
 		shortParam = req.URL.Path[1:]
 	}
 
-	longURL, ok := (*repository.MapShorts())[shortParam]
-	if !ok {
+	longURL, err := service.GetLongURL(shortParam)
+	if err != nil {
 		log.Printf("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
 		http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
+		return
 	}
 
-	log.Println("Map of short links: ", repository.MapShorts())
 	res.Header().Add("Location", longURL)
 
 	res.WriteHeader(http.StatusTemporaryRedirect)
@@ -38,6 +37,7 @@ func ActionPost(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Unable to read body: status: %d", http.StatusBadRequest)
 		http.Error(res, "Unable to read body", http.StatusBadRequest)
+		return
 	}
 	defer req.Body.Close()
 
@@ -45,6 +45,7 @@ func ActionPost(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 		http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
+		return
 	}
 
 	res.WriteHeader(http.StatusCreated)
@@ -56,6 +57,7 @@ func ActionPost(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
 		http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
+		return
 	}
 
 }

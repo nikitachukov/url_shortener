@@ -41,7 +41,8 @@ func ShortURL(long []byte) (string, error) {
 	}
 
 	var short string
-	for {
+	for attempts := 0; attempts < 255; attempts++ {
+
 		code, err := generateCode()
 		if err != nil {
 			return "", fmt.Errorf("failed to generate code: %w", err)
@@ -55,4 +56,13 @@ func ShortURL(long []byte) (string, error) {
 
 	log.Printf("Short url: %s set for long: %s", short, longStr)
 	return short, nil
+}
+
+func GetLongURL(short string) (string, error) {
+	m := repository.MapShorts()
+	long, exists := (*m)[short]
+	if !exists {
+		return "", fmt.Errorf("short url not found")
+	}
+	return long, nil
 }
