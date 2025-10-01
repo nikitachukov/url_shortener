@@ -93,6 +93,7 @@ func MakeActionPostApi(basePath string) http.HandlerFunc {
 		}
 
 		res.WriteHeader(http.StatusCreated)
+		res.Header().Set("Content-Type", "application/json")
 
 		if basePath == "" {
 			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s", req.Host, shortURL)})
