@@ -33,8 +33,8 @@ func (r *CustomReader) Close() error {
 	if err != nil {
 		return err
 	}
-	if rc, ok := r.CompressReader.(io.Closer); ok {
-		return rc.Close()
+	if closer, ok := r.CompressReader.(io.Closer); ok {
+		return closer.Close()
 	}
 
 	return nil
@@ -60,7 +60,6 @@ func CustomDecompress(next http.Handler) http.Handler {
 			dr, err := NewCustomReader(r.Body, encoding)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-
 				return
 			}
 			defer dr.Close()
@@ -68,7 +67,6 @@ func CustomDecompress(next http.Handler) http.Handler {
 			r.Body = dr
 		}
 
-		// no decompression
 		next.ServeHTTP(w, r)
 	})
 }
