@@ -23,7 +23,8 @@ func StartServer() {
 
 	Mux := chi.NewRouter()
 
-	Mux.Use(handler.HandlersLog)
+	Mux.Use(handler.LoggingHandlersMiddleware)
+	Mux.Use(handler.CustomDecompress)
 
 	Mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
 	Mux.Post("/api/shorten", handler.MakeActionPostAPI(*configuration.BasePath))

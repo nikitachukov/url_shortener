@@ -9,7 +9,7 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
 )
 
-func HandlersLog(next http.Handler) http.Handler {
+func LoggingHandlersMiddleware(next http.Handler) http.Handler {
 
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
