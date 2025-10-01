@@ -14,21 +14,22 @@ import (
 
 func StartServer() {
 
-	config.ParseParams()
+	configuration := config.NewParams()
+	configuration.InitParams()
 
 	repo := repository.NewInMemory()
 	service.InitRepo(repo)
 
 	Mux := chi.NewRouter()
-	Mux.Post("/", handler.ActionPost)
+	Mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
 
-	if *config.BasePath != "" {
-		Mux.Get("/"+*config.BasePath+"/{short}", handler.ActionGet)
+	if *configuration.BasePath != "" {
+		Mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)
 	} else {
 		Mux.Get("/{short}", handler.ActionGet)
 	}
 
-	serverPath := *config.AppAddr
+	serverPath := *configuration.AppAddr
 	log.Printf("Starting server on: http://%s", serverPath)
 
 	if err := http.ListenAndServe(serverPath, Mux); !errors.Is(err, http.ErrServerClosed) {

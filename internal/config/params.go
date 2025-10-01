@@ -5,13 +5,16 @@ import (
 	"os"
 )
 
-var (
+type Params struct {
 	AppAddr  *string
 	BasePath *string
-)
+}
 
-func ParseParams() {
+func NewParams() *Params {
+	return &Params{}
+}
 
+func (p *Params) InitParams() {
 	pFlagAppAddr := flag.String("a", "localhost:8080", "адрес запуска HTTP-сервера")
 	pFlagBasePath := flag.String("b", "", "базовый адрес результирующего сокращённого URL")
 	flag.Parse()
@@ -29,6 +32,9 @@ func ParseParams() {
 			BasePath = *pFlagBasePath
 		}
 	}
+
+	p.AppAddr = &AppAddr
+	p.BasePath = &BasePath
 
 	//Если указана переменная окружения, то используется она.
 	//Если нет переменной окружения, но есть аргумент командной строки (флаг), то используется он.
