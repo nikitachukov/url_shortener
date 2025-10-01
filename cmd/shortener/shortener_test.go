@@ -17,10 +17,11 @@ func TestHandlers(t *testing.T) {
 	service.InitRepo(repo)
 
 	t.Run("test POST", func(t *testing.T) {
-		config.ParseParams()
+		configuration := config.NewParams()
+		configuration.InitParams()
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
 		response := httptest.NewRecorder()
-		handler.ActionPost(response, request)
+		handler.MakeActionPost(*configuration.BasePath)(response, request)
 		result := response.Result()
 		defer result.Body.Close()
 		if result.StatusCode != http.StatusCreated {
