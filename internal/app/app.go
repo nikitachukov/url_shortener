@@ -8,15 +8,16 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
+	"github.com/nikitachukov/url_shortener.git/internal/repository"
+	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
 func StartServer() {
 
 	config.ParseParams()
 
-	//key := "newCode123"
-	//location := "http://example.com/page"
-	//(*repository.MapShorts())[key] = location
+	repo := repository.NewInMemory()
+	service.InitRepo(repo)
 
 	Mux := chi.NewRouter()
 	Mux.Post("/", handler.ActionPost)

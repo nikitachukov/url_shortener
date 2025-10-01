@@ -6,10 +6,34 @@ import (
 
 const defaultCapacity = 1000
 
-var (
-	mapShortener = make(model.MapShortener, defaultCapacity)
-)
+type ShortenerRepo interface {
+	FindShortURL(long string) (string, bool)
+	GetLongURL(short string) (string, bool)
+	Set(short, long string)
+}
 
-func MapShorts() *model.MapShortener {
-	return &mapShortener
+type MemoryRepo struct {
+	m model.MapShortener
+}
+
+func NewInMemory() *MemoryRepo {
+	return &MemoryRepo{m: make(model.MapShortener, defaultCapacity)}
+}
+
+func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
+	for short, l := range r.m {
+		if l == long {
+			return short, true
+		}
+	}
+	return "", false
+}
+
+func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
+	l, ok := r.m[short]
+	return l, ok
+}
+
+func (r *MemoryRepo) Set(short, long string) {
+	r.m[short] = long
 }

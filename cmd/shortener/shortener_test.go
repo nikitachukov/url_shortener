@@ -9,9 +9,13 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
+	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
 func TestHandlers(t *testing.T) {
+	repo := repository.NewInMemory()
+	service.InitRepo(repo)
+
 	t.Run("test POST", func(t *testing.T) {
 		config.ParseParams()
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
@@ -28,7 +32,7 @@ func TestHandlers(t *testing.T) {
 	t.Run("test GET", func(t *testing.T) {
 		key := "newCode123"
 		location := "http://example.com/page"
-		(*repository.MapShorts())[key] = location
+		repo.Set(key, location)
 
 		request, _ := http.NewRequest("GET", "/"+key, nil)
 		response := httptest.NewRecorder()
