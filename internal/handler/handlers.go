@@ -70,7 +70,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 	}
 }
 
-func MakeActionPostApi(basePath string) http.HandlerFunc {
+func MakeActionPostAPI(basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		var data ApiShortenReq
 		err := json.NewDecoder(req.Body).Decode(&data)
@@ -79,11 +79,11 @@ func MakeActionPostApi(basePath string) http.HandlerFunc {
 			return
 		}
 
-		if err != nil {
-			logger.Log.Sugar().Errorf("Unable to read body: status: %d", http.StatusBadRequest)
-			http.Error(res, "Unable to read body", http.StatusBadRequest)
-			return
-		}
+		//if err != nil {
+		//	logger.Log.Sugar().Errorf("Unable to read body: status: %d", http.StatusBadRequest)
+		//	http.Error(res, "Unable to read body", http.StatusBadRequest)
+		//	return
+		//}
 		defer req.Body.Close()
 
 		shortURL, err := service.ShortURL([]byte(data.URL))
@@ -102,10 +102,10 @@ func MakeActionPostApi(basePath string) http.HandlerFunc {
 		} else {
 			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)})
 		}
-		if err != nil {
-			logger.Log.Sugar().Errorf("Unexpected exception: status: %d", http.StatusInternalServerError)
-			http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
-			return
-		}
+		//if err != nil {
+		//	logger.Log.Sugar().Errorf("Unexpected exception: status: %d", http.StatusInternalServerError)
+		//	http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
+		//	return
+		//}
 	}
 }
