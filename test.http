@@ -1,0 +1,29 @@
+### post url for short
+POST http://127.0.0.1:8080
+
+https://gopnik.win/zzz
+
+> {%
+    client.global.set("rawBody", response.body);
+%}
+
+### get short url and redirect
+// @no-redirect
+// @no-log
+// @no-cookie-jar
+GET {{rawBody}}
+
+
+
+
+### post url for short api
+// @no-log
+// @no-cookie-jar
+POST http://127.0.0.1:8080/api/shorten
+Content-Type: application/json
+
+{
+  "url": "https://practicum.yandex.ru"
+}
+
+###
