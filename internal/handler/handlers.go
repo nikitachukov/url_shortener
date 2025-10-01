@@ -12,10 +12,10 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
-type ApiShortenReq struct {
+type APIShortenReq struct {
 	URL string `json:"url"`
 }
-type ApiShortenRes struct {
+type APIShortenRes struct {
 	Result string `json:"result"`
 }
 
@@ -72,18 +72,13 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 
 func MakeActionPostAPI(basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		var data ApiShortenReq
+		var data APIShortenReq
 		err := json.NewDecoder(req.Body).Decode(&data)
 		if err != nil {
 			http.Error(res, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		//if err != nil {
-		//	logger.Log.Sugar().Errorf("Unable to read body: status: %d", http.StatusBadRequest)
-		//	http.Error(res, "Unable to read body", http.StatusBadRequest)
-		//	return
-		//}
 		defer req.Body.Close()
 
 		shortURL, err := service.ShortURL([]byte(data.URL))
@@ -98,14 +93,10 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 
 		if basePath == "" {
 
-			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s", req.Host, shortURL)})
+			_render.JSON(res, req, APIShortenRes{Result: fmt.Sprintf("http://%s/%s", req.Host, shortURL)})
 		} else {
-			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)})
+			_render.JSON(res, req, APIShortenRes{Result: fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)})
 		}
-		//if err != nil {
-		//	logger.Log.Sugar().Errorf("Unexpected exception: status: %d", http.StatusInternalServerError)
-		//	http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
-		//	return
-		//}
+
 	}
 }
