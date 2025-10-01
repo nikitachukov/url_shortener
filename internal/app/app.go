@@ -26,6 +26,7 @@ func StartServer() {
 	Mux.Use(handler.HandlersLog)
 
 	Mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
+	Mux.Post("/api/shorten", handler.MakeActionPostApi(*configuration.BasePath))
 
 	if *configuration.BasePath != "" {
 		Mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)
