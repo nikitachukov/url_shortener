@@ -21,6 +21,9 @@ func StartServer() {
 	service.InitRepo(repo)
 
 	Mux := chi.NewRouter()
+
+	Mux.Use(handler.HandlersLog)
+
 	Mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
 
 	if *configuration.BasePath != "" {
