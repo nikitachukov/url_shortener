@@ -69,6 +69,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 		}
 	}
 }
+
 func MakeActionPostApi(basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		var data ApiShortenReq
@@ -92,10 +93,11 @@ func MakeActionPostApi(basePath string) http.HandlerFunc {
 			return
 		}
 
+		res.Header().Set("Content-Type", "application/json")
 		res.WriteHeader(http.StatusCreated)
-		//res.Header().Set("Content-Type", "application/json")
 
 		if basePath == "" {
+
 			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s", req.Host, shortURL)})
 		} else {
 			_render.JSON(res, req, ApiShortenRes{Result: fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)})

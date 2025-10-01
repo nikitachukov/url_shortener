@@ -34,3 +34,9 @@ TestIteration6:
 	go build  -o $(SHORTENER_BIN) cmd/shortener/shortener.go
 	./shortenertest -test.v -test.run=^TestIteration6$$ -binary-path=$(SHORTENER_BIN) -server-port=8888
 
+
+
+TestIteration7:
+	go build  -o $(SHORTENER_BIN) cmd/shortener/shortener.go
+	./shortenertest -test.v -test.run=^TestIteration7$$ -binary-path=$(SHORTENER_BIN) -server-port=8080 -file-storage-path="zzz" -source-path="."
+
