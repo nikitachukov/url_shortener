@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
 )
 
 func HandlersLog(next http.Handler) http.Handler {
@@ -17,12 +17,11 @@ func HandlersLog(next http.Handler) http.Handler {
 		newResponseWriter := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 		next.ServeHTTP(newResponseWriter, r.WithContext(r.Context()))
-		duration := time.Since(start)
 
-		log.Printf("uri [%s] method [%s] duration [%v]ms status [%v] size [%d]",
+		logger.Log.Sugar().Infof("uri [%s] method [%s] duration [%v]ms status [%v] size [%d]",
 			r.RequestURI,
 			r.Method,
-			strconv.FormatInt(duration.Milliseconds(), 10),
+			strconv.FormatInt(time.Since(start).Milliseconds(), 10),
 			newResponseWriter.Status(),
 			newResponseWriter.BytesWritten(),
 		)

@@ -3,11 +3,10 @@ package service
 import (
 	"crypto/rand"
 	"fmt"
-	"log"
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
+	"github.com/nikitachukov/url_shortener.git/internal/repository"
 	"math/big"
 	"strings"
-
-	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
 const asciiLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -38,7 +37,7 @@ func ShortURL(long []byte) (string, error) {
 	}
 
 	if shortURL, ok := Repo.FindShortURL(longStr); ok {
-		log.Printf("Short url: %s got for long: %s", shortURL, longStr)
+		logger.Log.Sugar().Infof("Short url: %s got for long: %s", shortURL, longStr)
 		return shortURL, nil
 	}
 
@@ -56,7 +55,7 @@ func ShortURL(long []byte) (string, error) {
 		}
 	}
 
-	log.Printf("Short url: %s set for long: %s", short, longStr)
+	logger.Log.Sugar().Infof("Short url: %s set for long: %s", short, longStr)
 	return short, nil
 }
 

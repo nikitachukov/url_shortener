@@ -2,17 +2,18 @@ package app
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
 func StartServer() {
+	logger.InitLogger()
 
 	configuration := config.NewParams()
 	configuration.InitParams()
@@ -33,11 +34,11 @@ func StartServer() {
 	}
 
 	serverPath := *configuration.AppAddr
-	log.Printf("Starting server on: http://%s", serverPath)
+	logger.Log.Sugar().Infof("Starting server on: http://%s", serverPath)
 
 	if err := http.ListenAndServe(serverPath, Mux); !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("HTTP server error: %v", err)
+		logger.Log.Sugar().Fatalf("HTTP server error: %v", err)
 	}
 
-	log.Println("Stopped serving new connections.")
+	logger.Log.Sugar().Info("Stopped serving new connections.")
 }

@@ -3,10 +3,10 @@ package handler
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
@@ -19,7 +19,7 @@ func ActionGet(res http.ResponseWriter, req *http.Request) {
 
 	longURL, err := service.GetLongURL(shortParam)
 	if err != nil {
-		log.Printf("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
+		logger.Log.Sugar().Infof("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
 		http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
 		return
 	}
@@ -27,7 +27,6 @@ func ActionGet(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("Location", longURL)
 
 	res.WriteHeader(http.StatusTemporaryRedirect)
-	log.Println("Full header: ", res.Header())
 
 }
 
@@ -35,7 +34,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
-			log.Printf("Unable to read body: status: %d", http.StatusBadRequest)
+			logger.Log.Sugar().Errorf("Unable to read body: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to read body", http.StatusBadRequest)
 			return
 		}
@@ -43,7 +42,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 
 		shortURL, err := service.ShortURL(body)
 		if err != nil {
-			log.Printf("Unable to shorten URL: status: %d", http.StatusBadRequest)
+			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
 			return
 		}
@@ -55,7 +54,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 			_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)))
 		}
 		if err != nil {
-			log.Printf("Unexpected exception: status: %d", http.StatusInternalServerError)
+			logger.Log.Sugar().Errorf("Unexpected exception: status: %d", http.StatusInternalServerError)
 			http.Error(res, "Unexpected exception: ", http.StatusInternalServerError)
 			return
 		}
