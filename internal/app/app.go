@@ -18,7 +18,7 @@ func StartServer() {
 	configuration := config.NewParams()
 	configuration.InitParams()
 
-	repo := repository.NewInMemory()
+	repo := repository.NewInMemory("zzz.json")
 	service.InitRepo(repo)
 
 	Mux := chi.NewRouter()

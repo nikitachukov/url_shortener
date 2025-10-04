@@ -16,8 +16,23 @@ type MemoryRepo struct {
 	m model.MapShortener
 }
 
-func NewInMemory() *MemoryRepo {
-	return &MemoryRepo{m: make(model.MapShortener, defaultCapacity)}
+func NewInMemory(path string) *MemoryRepo {
+	repo := &MemoryRepo{m: make(model.MapShortener, defaultCapacity)}
+	repo.Load(path)
+	return repo
+}
+
+func (r *MemoryRepo) Load(path string) {
+	//	[
+	//  {"uuid":"1","short_url":"4rSPg8ap","original_url":"http://yandex.ru"},
+	//  {"uuid":"2","short_url":"edVPg3ks","original_url":"http://ya.ru"},
+	//  {"uuid":"3","short_url":"dG56Hqxm","original_url":"http://practicum.yandex.ru"},
+	//  ...
+	//]
+}
+
+func (r *MemoryRepo) Save(path string) {
+	//
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
