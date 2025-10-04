@@ -41,20 +41,32 @@ func (r *MemoryRepo) Save() {
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
-	for short, l := range r.m {
-		if l == long {
-			return short, true
+	for _, l := range r.m {
+		if l.OriginalURL == long {
+			return l.ShortURL, true
 		}
 	}
 	return "", false
 }
 
 func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
-	l, ok := r.m[short]
-	return l, ok
+	for _, l := range r.m {
+		if l.ShortURL == short {
+			return l.OriginalURL, true
+		}
+	}
+	return "", false
 }
 
 func (r *MemoryRepo) Set(short, long string) {
-	r.m[short] = long
+	//r.m[short] = long
+
+	var item model.Item
+
+	item.ShortURL = short
+	item.OriginalURL = long
+
+	r.m = append(r.m, item)
+
 	r.Save()
 }
