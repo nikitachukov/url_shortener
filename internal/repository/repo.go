@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/nikitachukov/url_shortener.git/internal/model"
 )
 
@@ -13,7 +15,8 @@ type ShortenerRepo interface {
 }
 
 type MemoryRepo struct {
-	m model.MapShortener
+	m    model.MapShortener
+	path string
 }
 
 func NewInMemory(path string) *MemoryRepo {
@@ -23,6 +26,7 @@ func NewInMemory(path string) *MemoryRepo {
 }
 
 func (r *MemoryRepo) Load(path string) {
+	r.path = path
 	//	[
 	//  {"uuid":"1","short_url":"4rSPg8ap","original_url":"http://yandex.ru"},
 	//  {"uuid":"2","short_url":"edVPg3ks","original_url":"http://ya.ru"},
@@ -31,7 +35,8 @@ func (r *MemoryRepo) Load(path string) {
 	//]
 }
 
-func (r *MemoryRepo) Save(path string) {
+func (r *MemoryRepo) Save() {
+	log.Println(r.path)
 	//
 }
 
@@ -51,4 +56,5 @@ func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
 
 func (r *MemoryRepo) Set(short, long string) {
 	r.m[short] = long
+	r.Save()
 }
