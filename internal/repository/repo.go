@@ -27,7 +27,7 @@ func NewInMemory(filename string) *MemoryRepo {
 	if filename != "" {
 		err := repo.Load(filename)
 		if err != nil {
-			return nil
+			return repo
 		}
 	}
 	return repo
