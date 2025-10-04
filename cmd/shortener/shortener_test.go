@@ -13,7 +13,7 @@ import (
 )
 
 func TestHandlers(t *testing.T) {
-	repo := repository.NewInMemory()
+	repo := repository.NewInMemory("")
 	service.InitRepo(repo)
 
 	t.Run("test POST", func(t *testing.T) {

@@ -3,6 +3,7 @@ GOTOOLCHAIN=go1.24.5
 SHORTENER_BIN=bin/shortener
 SHORTENERTEST_BIN=tools/shortenertest
 STATICTEST_BIN=tools/statictest
+DATA_FILE=data.json
 
 myautotest:
 	go test -v ./cmd/*
@@ -40,5 +41,5 @@ TestIteration8: clean prep vet build myautotest
 	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
 
 TestIteration9: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
+	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE)-source-path="." | tee >(richgo testfilter)
 

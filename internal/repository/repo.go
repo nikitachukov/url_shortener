@@ -1,12 +1,14 @@
 package repository
 
 import (
+	"encoding/json"
 	"log"
+	"os"
+	"strconv"
 
+	"github.com/goforj/godump"
 	"github.com/nikitachukov/url_shortener.git/internal/model"
 )
-
-const defaultCapacity = 1000
 
 type ShortenerRepo interface {
 	FindShortURL(long string) (string, bool)
@@ -15,29 +17,43 @@ type ShortenerRepo interface {
 }
 
 type MemoryRepo struct {
-	m    model.MapShortener
-	path string
+	m         model.MapShortener
+	path      string
+	currentID int
 }
 
-func NewInMemory(path string) *MemoryRepo {
-	repo := &MemoryRepo{m: make(model.MapShortener, defaultCapacity)}
-	repo.Load(path)
+func NewInMemory(filename string) *MemoryRepo {
+	repo := &MemoryRepo{m: make(model.MapShortener, 0)}
+	repo.currentID = 0
+	if filename != "" {
+		err := repo.Load(filename)
+		if err != nil {
+			return nil
+		}
+	}
 	return repo
 }
 
-func (r *MemoryRepo) Load(path string) {
-	r.path = path
-	//	[
-	//  {"uuid":"1","short_url":"4rSPg8ap","original_url":"http://yandex.ru"},
-	//  {"uuid":"2","short_url":"edVPg3ks","original_url":"http://ya.ru"},
-	//  {"uuid":"3","short_url":"dG56Hqxm","original_url":"http://practicum.yandex.ru"},
-	//  ...
-	//]
+func (r *MemoryRepo) Load(filename string) error {
+	r.path = filename
+	fileData, err := os.ReadFile(r.path)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(fileData, &r.m)
+	if err != nil {
+		return err
+	}
+	r.currentID = len(r.m)
+
+	return nil
+
 }
 
 func (r *MemoryRepo) Save() {
 	log.Println(r.path)
-	//
+	godump.Dump(r.m)
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
@@ -59,14 +75,11 @@ func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
 }
 
 func (r *MemoryRepo) Set(short, long string) {
-	//r.m[short] = long
-
 	var item model.Item
-
+	r.currentID++
+	item.UUID = strconv.Itoa(r.currentID)
 	item.ShortURL = short
 	item.OriginalURL = long
-
 	r.m = append(r.m, item)
-
 	r.Save()
 }

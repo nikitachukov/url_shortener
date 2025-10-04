@@ -18,7 +18,10 @@ func StartServer() {
 	configuration := config.NewParams()
 	configuration.InitParams()
 
-	repo := repository.NewInMemory("zzz.json")
+	repo := repository.NewInMemory(*configuration.FileStoragePath)
+	if repo == nil {
+		logger.Log.Sugar().Panicf("Failed to init repo")
+	}
 	service.InitRepo(repo)
 
 	Mux := chi.NewRouter()
