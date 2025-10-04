@@ -65,9 +65,6 @@ func (r *MemoryRepo) Save() {
 
 	}
 
-	//log.Println(r.path)
-	//
-	//godump.Dump(r.m)
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
