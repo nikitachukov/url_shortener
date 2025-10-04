@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/goforj/godump"
 	"github.com/nikitachukov/url_shortener.git/internal/model"
 )
 
@@ -52,8 +51,23 @@ func (r *MemoryRepo) Load(filename string) error {
 }
 
 func (r *MemoryRepo) Save() {
-	log.Println(r.path)
-	godump.Dump(r.m)
+	if r.path != "" {
+
+		fileData, err := json.Marshal(r.m)
+		if err != nil {
+			log.Println(err)
+		}
+		err = os.WriteFile(r.path, fileData, 0644)
+		if err != nil {
+			log.Println(err)
+		}
+		return
+
+	}
+
+	//log.Println(r.path)
+	//
+	//godump.Dump(r.m)
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
