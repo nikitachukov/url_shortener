@@ -26,4 +26,6 @@ Content-Type: application/json
   "url": "https://practicum.yandex.ru"
 }
 
-###
+### ping
+GET 127.0.0.1:8080/ping
+Content-Type: application/json
