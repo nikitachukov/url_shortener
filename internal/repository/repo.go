@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
 	"github.com/nikitachukov/url_shortener.git/internal/model"
 )
 
@@ -45,18 +46,20 @@ func (r *MemoryRepo) Load(filename string) error {
 
 	data, err := os.ReadFile(r.path)
 	if err != nil {
-		panic(err)
+		logger.Log.Sugar().Infof("Error reading file: %s", err)
 	}
 
 	err = json.Unmarshal([]byte(data), &items)
 	if err != nil {
-		panic(err)
+		logger.Log.Sugar().Infof("Error parcing file: %s", err)
 	}
 
 	for _, item := range items {
 		r.m[item.ShortURL] = item
 		r.currentID++
 	}
+
+	logger.Log.Sugar().Infof("Loaded %d items from %s", len(items), filename)
 
 	r.mu.Unlock()
 
