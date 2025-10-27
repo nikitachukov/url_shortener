@@ -1,4 +1,0 @@
-{"uuid":"1","short_url":"4rSPg8ap","original_url":"http://yandex.ru"}
-{"uuid":"2","short_url":"BR1CtnCk8C","original_url":"https://gopnik1.win/zzzxxxyyyyy"}
-{"uuid":"3","short_url":"uAIKh6lia8","original_url":"https://gopnik1.win/zzzxxx"}
-{"uuid":"4","short_url":"83ZHoUMvOV","original_url":"https://gopnik1.win/123qwe"}
