@@ -13,8 +13,8 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
-	"github.com/nikitachukov/url_shortener.git/internal/repository/dbRepo"
-	"github.com/nikitachukov/url_shortener.git/internal/repository/memoryRepo"
+	"github.com/nikitachukov/url_shortener.git/internal/repository/dbrepo"
+	"github.com/nikitachukov/url_shortener.git/internal/repository/memoryrepo"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
@@ -25,9 +25,9 @@ func StartServer() {
 	configuration.InitParams()
 
 	if *configuration.DSN != "" {
-		service.InitRepo(dbRepo.NewDB(*configuration.DSN))
+		service.InitRepo(dbrepo.NewDB(*configuration.DSN))
 	} else {
-		service.InitRepo(memoryRepo.NewInMemory(*configuration.FileStoragePath))
+		service.InitRepo(memoryrepo.NewInMemory(*configuration.FileStoragePath))
 	}
 
 	mux := chi.NewRouter()

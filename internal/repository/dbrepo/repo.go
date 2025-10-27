@@ -1,4 +1,4 @@
-package dbRepo
+package dbrepo
 
 import (
 	"context"
@@ -11,12 +11,12 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
 )
 
-type DbRepo struct {
+type DBRepo struct {
 	db *sql.DB
 	mu sync.RWMutex
 }
 
-func (r *DbRepo) Ping() bool {
+func (r *DBRepo) Ping() bool {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -29,14 +29,14 @@ func (r *DbRepo) Ping() bool {
 
 }
 
-func NewDB(dsn string) *DbRepo {
+func NewDB(dsn string) *DBRepo {
 
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		panic(err)
 	}
 
-	repo := &DbRepo{
+	repo := &DBRepo{
 		db: db,
 	}
 
@@ -45,22 +45,21 @@ func NewDB(dsn string) *DbRepo {
 	return repo
 }
 
-func (r *DbRepo) Load(filename string) error {
-	return nil
+func (r *DBRepo) Load() {
 }
 
-func (r *DbRepo) Save() {
+func (r *DBRepo) Save() {
 
 }
 
-func (r *DbRepo) FindShortURL(long string) (string, bool) {
+func (r *DBRepo) FindShortURL(long string) (string, bool) {
 	return "", false
 }
 
-func (r *DbRepo) GetLongURL(short string) (string, bool) {
+func (r *DBRepo) GetLongURL(short string) (string, bool) {
 	return "", false
 }
 
-func (r *DbRepo) Set(short, long string) {
+func (r *DBRepo) Set(short, long string) {
 
 }

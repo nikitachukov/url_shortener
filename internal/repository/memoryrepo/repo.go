@@ -1,4 +1,4 @@
-package memoryRepo
+package memoryrepo
 
 import (
 	"encoding/json"
