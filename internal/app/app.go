@@ -1,8 +1,13 @@
 package app
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/nikitachukov/url_shortener.git/internal/config"
@@ -19,31 +24,51 @@ func StartServer() {
 	configuration.InitParams()
 
 	repo := repository.NewInMemory(*configuration.FileStoragePath)
-	//if repo == nil {
-	//	//logger.Log.Sugar().Panicf("Failed to init repo")
-	//}
 	service.InitRepo(repo)
 
-	Mux := chi.NewRouter()
+	mux := chi.NewRouter()
 
-	Mux.Use(handler.LoggingHandlersMiddleware)
-	Mux.Use(handler.CustomDecompress)
+	mux.Use(handler.LoggingHandlersMiddleware)
+	mux.Use(handler.CustomDecompress)
 
-	Mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
-	Mux.Post("/api/shorten", handler.MakeActionPostAPI(*configuration.BasePath))
+	mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
+	mux.Post("/api/shorten", handler.MakeActionPostAPI(*configuration.BasePath))
 
 	if *configuration.BasePath != "" {
-		Mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)
+		mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)
 	} else {
-		Mux.Get("/{short}", handler.ActionGet)
+		mux.Get("/{short}", handler.ActionGet)
 	}
 
 	serverPath := *configuration.AppAddr
-	logger.Log.Sugar().Infof("Starting server on: http://%s", serverPath)
 
-	if err := http.ListenAndServe(serverPath, Mux); !errors.Is(err, http.ErrServerClosed) {
-		logger.Log.Sugar().Fatalf("HTTP server error: %v", err)
+	server := &http.Server{
+		Addr:    serverPath,
+		Handler: mux,
 	}
 
-	logger.Log.Sugar().Info("Stopped serving new connections.")
+	logger.Log.Sugar().Infof("Starting server on: http://%s", serverPath)
+
+	// Start server in a separate goroutine
+	go func() {
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+
+			logger.Log.Sugar().Fatalf("HTTP server error: %v", err)
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	<-stop
+
+	logger.Log.Sugar().Info("Shutdown signal received. Initiating graceful shutdown...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Log.Sugar().Fatalf("HTTP server shutdown error: %v", err)
+	}
+
+	logger.Log.Sugar().Info("Server gracefully stopped.")
 }
