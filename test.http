@@ -1,7 +1,7 @@
 ### post url for short
 POST http://127.0.0.1:8080
 
-https://gopnik1.win/zzzxxxx
+https://gopnik.win/pipiska
 
 > {%
     client.global.set("rawBody", response.body);

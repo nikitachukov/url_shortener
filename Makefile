@@ -17,9 +17,9 @@ vet:
 build:
 	go build  -o $(SHORTENER_BIN) cmd/shortener/shortener.go
 up_migrations:
-	migrate -path migrations/ -database "pgx5://user:password@localhost:5432/db?sslmode=disable"  -verbose up
+	migrate -path migrations/ -database "postgres://user:password@localhost:5432/db?sslmode=disable"  -verbose up
 down_migrations:
-	migrate -path migrations/ -database "pgx5://user:password@localhost:5432/db?sslmode=disable"  -verbose down
+	migrate -path migrations/ -database "postgres://user:password@localhost:5432/db?sslmode=disable"  -verbose down
 
 TestIteration1: clean prep vet build myautotest
 	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)

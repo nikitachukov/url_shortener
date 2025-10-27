@@ -55,6 +55,9 @@ func NewDB(dsn string) *DBRepo {
 		log.Fatal(err)
 	}
 	if err := m.Up(); err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			logger.Log.Sugar().Info("No changes found in migrations")
+		}
 
 	}
 
