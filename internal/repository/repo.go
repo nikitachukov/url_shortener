@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/nikitachukov/url_shortener.git/internal/model"
 )
@@ -21,6 +22,7 @@ type MemoryRepo struct {
 	m         model.MapShortener
 	path      string
 	currentID int
+	mu        sync.RWMutex
 }
 
 func NewInMemory(filename string) *MemoryRepo {
@@ -39,6 +41,8 @@ func NewInMemory(filename string) *MemoryRepo {
 
 func (r *MemoryRepo) Load(filename string) error {
 	var item model.Item
+
+	r.mu.Lock()
 	r.path = filename
 
 	file, err := os.Open(r.path)
@@ -48,7 +52,6 @@ func (r *MemoryRepo) Load(filename string) error {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-
 	r.currentID = 1
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -65,50 +68,37 @@ func (r *MemoryRepo) Load(filename string) error {
 		log.Fatal(err)
 	}
 
+	r.mu.Unlock()
 	return nil
 
 }
 
 func (r *MemoryRepo) Save(short string) {
-	if r.path != "" {
+	path := r.path
+	item := r.m[short]
 
-		file, err := os.OpenFile(r.path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if path != "" {
+		file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			fmt.Println("Ошибка открытия файла:", err)
 			return
 		}
 		defer file.Close()
 
-		line, _ := json.Marshal(r.m[short])
+		line, _ := json.Marshal(item)
 
 		if _, err := file.WriteString("\n" + string(line)); err != nil {
 			fmt.Println("Ошибка записи:", err)
 			return
 		}
-
-		//for _, v := range r.m {
-		//	jsonOutput, _ := json.Marshal(v)
-		//	println(string(jsonOutput))
-		//}
-		//
-		//fileData, err := json.Marshal(r.m)
-		//if err != nil {
-		//	log.Println(err)
-		//}
-		//err = os.WriteFile(r.path, fileData, 0644)
-		//if err != nil {
-		//	log.Println(err)
-		//}
-		//return
-
 	}
-
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	for _, l := range r.m {
 		if l.OriginalURL == long {
-
 			return l.ShortURL, true
 		}
 	}
@@ -116,7 +106,9 @@ func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
 }
 
 func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
+	r.mu.RLock()
 	item, ok := r.m[short]
+	r.mu.RUnlock()
 	if ok {
 		return item.OriginalURL, true
 	} else {
@@ -126,10 +118,12 @@ func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
 
 func (r *MemoryRepo) Set(short, long string) {
 	var item model.Item
+	r.mu.Lock()
 	item.UUID = strconv.Itoa(r.currentID)
 	item.ShortURL = short
 	item.OriginalURL = long
 	r.m[short] = item
-	r.Save(short)
 	r.currentID++
+	r.Save(short)
+	r.mu.Unlock()
 }
