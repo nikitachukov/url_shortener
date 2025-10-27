@@ -92,8 +92,6 @@ func (r *MemoryRepo) Save() {
 
 	}
 
-	return
-
 }
 
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
