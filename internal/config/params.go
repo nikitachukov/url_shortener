@@ -9,6 +9,7 @@ type Params struct {
 	AppAddr         *string
 	BasePath        *string
 	FileStoragePath *string
+	DSN             *string
 }
 
 func NewParams() *Params {
@@ -19,6 +20,7 @@ func (p *Params) InitParams() {
 	pFlagAppAddr := flag.String("a", "localhost:8080", "адрес запуска HTTP-сервера")
 	pFlagBasePath := flag.String("b", "", "базовый адрес результирующего сокращённого URL")
 	pFileStoragePath := flag.String("f", "", "путь до файла, куда сохраняются данные")
+	pDSN := flag.String("d", "", "dsn базы данных")
 	flag.Parse()
 
 	AppAddr := os.Getenv("SERVER_ADDRESS")
@@ -42,9 +44,17 @@ func (p *Params) InitParams() {
 		}
 	}
 
+	DSN := os.Getenv("DATABASE_DSN")
+	if DSN == "" {
+		if *pDSN != "" {
+			DSN = *pDSN
+		}
+	}
+
 	p.AppAddr = &AppAddr
 	p.BasePath = &BasePath
 	p.FileStoragePath = &FileStoragePath
+	p.DSN = &DSN
 
 	//Если указана переменная окружения, то используется она.
 	//Если нет переменной окружения, но есть аргумент командной строки (флаг), то используется он.

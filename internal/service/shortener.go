@@ -3,10 +3,11 @@ package service
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/nikitachukov/url_shortener.git/internal/logger"
-	"github.com/nikitachukov/url_shortener.git/internal/repository"
 	"math/big"
 	"strings"
+
+	"github.com/nikitachukov/url_shortener.git/internal/logger"
+	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
 const asciiLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -68,4 +69,8 @@ func GetLongURL(short string) (string, error) {
 		return "", fmt.Errorf("short url not found")
 	}
 	return long, nil
+}
+
+func Ping() bool {
+	return Repo.Ping()
 }

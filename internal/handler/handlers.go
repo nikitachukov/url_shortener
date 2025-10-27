@@ -100,3 +100,13 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 
 	}
 }
+
+func Ping(res http.ResponseWriter, req *http.Request) {
+	if service.Ping() {
+		res.WriteHeader(http.StatusOK)
+		return
+	} else {
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}

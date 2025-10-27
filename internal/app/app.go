@@ -13,7 +13,8 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/config"
 	"github.com/nikitachukov/url_shortener.git/internal/handler"
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
-	"github.com/nikitachukov/url_shortener.git/internal/repository"
+	"github.com/nikitachukov/url_shortener.git/internal/repository/dbRepo"
+	"github.com/nikitachukov/url_shortener.git/internal/repository/memoryRepo"
 	"github.com/nikitachukov/url_shortener.git/internal/service"
 )
 
@@ -23,8 +24,11 @@ func StartServer() {
 	configuration := config.NewParams()
 	configuration.InitParams()
 
-	repo := repository.NewInMemory(*configuration.FileStoragePath)
-	service.InitRepo(repo)
+	if *configuration.DSN != "" {
+		service.InitRepo(dbRepo.NewDB(*configuration.DSN))
+	} else {
+		service.InitRepo(memoryRepo.NewInMemory(*configuration.FileStoragePath))
+	}
 
 	mux := chi.NewRouter()
 
@@ -39,6 +43,8 @@ func StartServer() {
 	} else {
 		mux.Get("/{short}", handler.ActionGet)
 	}
+
+	mux.Get("/ping", handler.Ping)
 
 	serverPath := *configuration.AppAddr
 
