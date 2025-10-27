@@ -22,8 +22,10 @@ type MemoryRepo struct {
 }
 
 func NewInMemory(filename string) *MemoryRepo {
+
 	repo := &MemoryRepo{m: make(model.MapShortener, 0)}
 	repo.currentID = 0
+
 	if filename != "" {
 		err := repo.Load(filename)
 		if err != nil {
@@ -70,6 +72,7 @@ func (r *MemoryRepo) Save() {
 func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
 	for _, l := range r.m {
 		if l.OriginalURL == long {
+
 			return l.ShortURL, true
 		}
 	}
@@ -77,12 +80,12 @@ func (r *MemoryRepo) FindShortURL(long string) (string, bool) {
 }
 
 func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
-	for _, l := range r.m {
-		if l.ShortURL == short {
-			return l.OriginalURL, true
-		}
+	item, ok := r.m[short]
+	if ok {
+		return item.OriginalURL, true
+	} else {
+		return "", false
 	}
-	return "", false
 }
 
 func (r *MemoryRepo) Set(short, long string) {
@@ -91,6 +94,6 @@ func (r *MemoryRepo) Set(short, long string) {
 	item.UUID = strconv.Itoa(r.currentID)
 	item.ShortURL = short
 	item.OriginalURL = long
-	r.m = append(r.m, item)
+	r.m[short] = item
 	r.Save()
 }

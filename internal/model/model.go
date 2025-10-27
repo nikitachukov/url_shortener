@@ -1,6 +1,6 @@
 package model
 
-type MapShortener []Item
+type MapShortener map[string]Item
 
 type Item struct {
 	UUID        string `json:"uuid"`
