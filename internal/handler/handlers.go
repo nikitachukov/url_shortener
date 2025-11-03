@@ -146,6 +146,9 @@ func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
 			}
 		}
 
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusCreated)
+
 		_render.JSON(res, req, resData)
 
 	}
