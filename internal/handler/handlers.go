@@ -19,6 +19,16 @@ type APIShortenRes struct {
 	Result string `json:"result"`
 }
 
+type APIShortenBatchReq struct {
+	CorrelationID string `json:"correlation_id"`
+	OriginalURL   string `json:"original_url"`
+}
+
+type APIShortenBatchRes struct {
+	CorrelationID string `json:"correlation_id"`
+	ShortURL      string `json:"short_url"`
+}
+
 func ActionGet(res http.ResponseWriter, req *http.Request) {
 
 	shortParam := chi.URLParam(req, "short")
@@ -108,5 +118,35 @@ func Ping(res http.ResponseWriter, req *http.Request) {
 	} else {
 		res.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+}
+
+func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		var (
+			reqData []APIShortenBatchReq
+			resData []APIShortenBatchRes
+		)
+
+		err := json.NewDecoder(req.Body).Decode(&reqData)
+		if err != nil {
+			http.Error(res, err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer req.Body.Close()
+
+		for _, item := range reqData {
+			shortURL, _ := service.ShortURL([]byte(item.OriginalURL))
+			if basePath == "" {
+				shortURLFull := fmt.Sprintf("http://%s/%s", req.Host, shortURL)
+				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: shortURLFull})
+			} else {
+				shortURLFull := fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, resData)
+				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: shortURLFull})
+			}
+		}
+
+		_render.JSON(res, req, resData)
+
 	}
 }

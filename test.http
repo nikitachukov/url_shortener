@@ -29,3 +29,20 @@ Content-Type: application/json
 ### ping
 GET 127.0.0.1:8080/ping
 Content-Type: application/json
+
+### post url for short batch api
+// @no-log
+// @no-cookie-jar
+POST http://127.0.0.1:8080/api/shorten/batch
+Content-Type: application/json
+
+[
+  {
+    "correlation_id": "qwe123",
+    "original_url": "https://google.com"
+  },
+  {
+    "correlation_id": "qwe234",
+    "original_url": "https://sber.ru"
+  }
+]

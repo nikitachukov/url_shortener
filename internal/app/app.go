@@ -37,6 +37,7 @@ func StartServer() {
 
 	mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
 	mux.Post("/api/shorten", handler.MakeActionPostAPI(*configuration.BasePath))
+	mux.Post("/api/shorten/batch", handler.MakeActionPostBatchAPI(*configuration.BasePath))
 
 	if *configuration.BasePath != "" {
 		mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)

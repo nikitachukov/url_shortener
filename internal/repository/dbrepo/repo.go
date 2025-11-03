@@ -9,12 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	//"github.com/nikitachukov/url_shortener.git/internal/model"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
 )
 
