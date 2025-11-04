@@ -60,3 +60,6 @@ TestIteration12: clean prep vet build myautotest
 TestIteration13: clean prep vet build myautotest
 	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
 
+TestIteration14: clean prep vet build myautotest
+	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
+
