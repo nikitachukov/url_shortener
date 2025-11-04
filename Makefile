@@ -20,46 +20,5 @@ up_migrations:
 	migrate -path migrations/ -database "postgres://user:password@localhost:5432/db?sslmode=disable"  -verbose up
 down_migrations:
 	migrate -path migrations/ -database "postgres://user:password@localhost:5432/db?sslmode=disable"  -verbose down
-
-TestIteration1: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration2: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration3: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration4: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration5: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration6: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration7: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration8: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path="zzz" -source-path="." | tee >(richgo testfilter)
-
-TestIteration9: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." | tee >(richgo testfilter)
-
-TestIteration10: clean prep vet build myautotest
+TestIteration%: clean prep vet build myautotest
 	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
-
-TestIteration11: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
-
-TestIteration12: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
-
-TestIteration13: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
-
-TestIteration14: clean prep vet build myautotest
-	$(SHORTENERTEST_BIN) -test.v -test.run=^$@$$ -binary-path=$(SHORTENER_BIN) -server-port=8888 -file-storage-path=$(DATA_FILE) -source-path="." -database-dsn=$(DSN)| tee >(richgo testfilter)
-
