@@ -65,12 +65,12 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
 			return
 		}
-		if exsist {
+		if !exsist {
 			res.WriteHeader(http.StatusCreated)
 		} else {
 			res.WriteHeader(http.StatusConflict)
-
 		}
+
 		if basePath == "" {
 			_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s", req.Host, shortURL)))
 		} else {
@@ -95,7 +95,7 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 
 		defer req.Body.Close()
 
-		shortURL, _, err := service.ShortURL([]byte(data.URL))
+		shortURL, exsist, err := service.ShortURL([]byte(data.URL))
 		if err != nil {
 			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
@@ -103,7 +103,12 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 		}
 
 		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusCreated)
+
+		if !exsist {
+			res.WriteHeader(http.StatusCreated)
+		} else {
+			res.WriteHeader(http.StatusConflict)
+		}
 
 		if basePath == "" {
 

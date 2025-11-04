@@ -103,7 +103,7 @@ func (r *DBRepo) GetLongURL(short string) (string, bool) {
 }
 
 func (r *DBRepo) Set(short, long string) bool {
-	_, err := r.db.Exec("INSERT INTO shortener (key, original_url) VALUES ($1, $2) on conflict do nothing", short, long)
+	_, err := r.db.Exec("INSERT INTO shortener (key, original_url) VALUES ($1, $2)", short, long)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
