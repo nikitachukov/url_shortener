@@ -12,7 +12,9 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/nikitachukov/url_shortener.git/internal/logger"
 )
@@ -100,6 +102,17 @@ func (r *DBRepo) GetLongURL(short string) (string, bool) {
 
 }
 
-func (r *DBRepo) Set(short, long string) {
-	r.db.Exec("INSERT INTO shortener (key, original_url) VALUES ($1, $2)", short, long)
+func (r *DBRepo) Set(short, long string) bool {
+	_, err := r.db.Exec("INSERT INTO shortener (key, original_url) VALUES ($1, $2) on conflict do nothing", short, long)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return true
+			}
+		}
+
+	}
+	return false
+
 }

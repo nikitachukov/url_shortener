@@ -31,33 +31,29 @@ func generateCode() (string, error) {
 	return string(b), nil
 }
 
-func ShortURL(long []byte) (string, error) {
+func ShortURL(long []byte) (string, bool, error) {
 	longStr := strings.TrimSpace(string(long))
 	if longStr == "" {
-		return "", fmt.Errorf("empty URL is not allowed")
-	}
-
-	if shortURL, ok := Repo.FindShortURL(longStr); ok {
-		logger.Log.Sugar().Infof("Short url: %s got for long: %s", shortURL, longStr)
-		return shortURL, nil
+		return "", false, fmt.Errorf("empty URL is not allowed")
 	}
 
 	var short string
 
-	for attempts := 0; attempts < 255; attempts++ {
-		code, err := generateCode()
-		if err != nil {
-			return "", fmt.Errorf("failed to generate code: %w", err)
-		}
-		if _, exists := Repo.GetLongURL(code); !exists {
-			short = code
-			Repo.Set(short, longStr)
-			break
-		}
+	code, err := generateCode()
+
+	if err != nil {
+		return "", false, fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	logger.Log.Sugar().Infof("Short url: %s set for long: %s", short, longStr)
-	return short, nil
+	if exists := Repo.Set(code, longStr); !exists {
+		short = code
+		logger.Log.Sugar().Infof("Short url: %s set for long: %s", short, longStr)
+		return short, false, nil
+	} else {
+		short, _ = Repo.FindShortURL(longStr)
+		logger.Log.Sugar().Infof("Short url: %s exsist! long: %s", short, longStr)
+		return short, true, nil
+	}
 }
 
 func GetLongURL(short string) (string, error) {

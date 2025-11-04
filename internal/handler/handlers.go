@@ -59,14 +59,18 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 		}
 		defer req.Body.Close()
 
-		shortURL, err := service.ShortURL(body)
+		shortURL, exsist, err := service.ShortURL(body)
 		if err != nil {
 			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
 			return
 		}
+		if exsist {
+			res.WriteHeader(http.StatusCreated)
+		} else {
+			res.WriteHeader(http.StatusConflict)
 
-		res.WriteHeader(http.StatusCreated)
+		}
 		if basePath == "" {
 			_, err = res.Write([]byte(fmt.Sprintf("http://%s/%s", req.Host, shortURL)))
 		} else {
@@ -91,7 +95,7 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 
 		defer req.Body.Close()
 
-		shortURL, err := service.ShortURL([]byte(data.URL))
+		shortURL, _, err := service.ShortURL([]byte(data.URL))
 		if err != nil {
 			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
@@ -136,7 +140,7 @@ func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
 		defer req.Body.Close()
 
 		for _, item := range reqData {
-			shortURL, _ := service.ShortURL([]byte(item.OriginalURL))
+			shortURL, _, _ := service.ShortURL([]byte(item.OriginalURL))
 			if basePath == "" {
 				shortURLFull := fmt.Sprintf("http://%s/%s", req.Host, shortURL)
 				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: shortURLFull})

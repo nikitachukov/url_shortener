@@ -117,7 +117,7 @@ func (r *MemoryRepo) GetLongURL(short string) (string, bool) {
 	}
 }
 
-func (r *MemoryRepo) Set(short, long string) {
+func (r *MemoryRepo) Set(short, long string) bool {
 	var item model.Item
 	r.currentID++
 	r.mu.Lock()
@@ -127,4 +127,5 @@ func (r *MemoryRepo) Set(short, long string) {
 	r.m[short] = item
 	r.Save()
 	r.mu.Unlock()
+	return false
 }
