@@ -29,27 +29,26 @@ type APIShortenBatchRes struct {
 	ShortURL      string `json:"short_url"`
 }
 
-func ActionGet(res http.ResponseWriter, req *http.Request) {
+func MakeActionGet(svc *service.Service) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		shortParam := chi.URLParam(req, "short")
+		if shortParam == "" {
+			shortParam = req.URL.Path[1:]
+		}
 
-	shortParam := chi.URLParam(req, "short")
-	if shortParam == "" {
-		shortParam = req.URL.Path[1:]
+		longURL, err := svc.GetLongURL(shortParam)
+		if err != nil {
+			logger.Log.Sugar().Infof("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
+			http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
+			return
+		}
+
+		res.Header().Add("Location", longURL)
+		res.WriteHeader(http.StatusTemporaryRedirect)
 	}
-
-	longURL, err := service.GetLongURL(shortParam)
-	if err != nil {
-		logger.Log.Sugar().Infof("Unable to find longURL URL for short: %s: status: %d", shortParam, http.StatusBadRequest)
-		http.Error(res, "Unable to find longURL URL for short", http.StatusBadRequest)
-		return
-	}
-
-	res.Header().Add("Location", longURL)
-
-	res.WriteHeader(http.StatusTemporaryRedirect)
-
 }
 
-func MakeActionPost(basePath string) http.HandlerFunc {
+func MakeActionPost(svc *service.Service, basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
@@ -59,7 +58,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 		}
 		defer req.Body.Close()
 
-		shortURL, exsist, err := service.ShortURL(body)
+		shortURL, exsist, err := svc.ShortURL(body)
 		if err != nil {
 			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
@@ -84,7 +83,7 @@ func MakeActionPost(basePath string) http.HandlerFunc {
 	}
 }
 
-func MakeActionPostAPI(basePath string) http.HandlerFunc {
+func MakeActionPostAPI(svc *service.Service, basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		var data APIShortenReq
 		err := json.NewDecoder(req.Body).Decode(&data)
@@ -95,7 +94,7 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 
 		defer req.Body.Close()
 
-		shortURL, exsist, err := service.ShortURL([]byte(data.URL))
+		shortURL, exsist, err := svc.ShortURL([]byte(data.URL))
 		if err != nil {
 			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
 			http.Error(res, "Unable to shorten URL", http.StatusBadRequest)
@@ -120,17 +119,19 @@ func MakeActionPostAPI(basePath string) http.HandlerFunc {
 	}
 }
 
-func Ping(res http.ResponseWriter, req *http.Request) {
-	if service.Ping() {
-		res.WriteHeader(http.StatusOK)
-		return
-	} else {
-		res.WriteHeader(http.StatusInternalServerError)
-		return
+func PingHandler(svc *service.Service) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		if svc.Ping() {
+			res.WriteHeader(http.StatusOK)
+			return
+		} else {
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
-func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
+func MakeActionPostBatchAPI(svc *service.Service, basePath string) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		var (
 			reqData []APIShortenBatchReq
@@ -150,7 +151,7 @@ func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
 		defer req.Body.Close()
 
 		for _, item := range reqData {
-			shortURL, _, err := service.ShortURL([]byte(item.OriginalURL))
+			shortURL, _, err := svc.ShortURL([]byte(item.OriginalURL))
 
 			if err != nil {
 				logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusInternalServerError)

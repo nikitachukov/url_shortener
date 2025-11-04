@@ -21,15 +21,16 @@ func TestHandlers(t *testing.T) {
 
 	if configuration.DSN != "" {
 		repo = dbrepo.NewDB(configuration.DSN)
-		service.InitRepo(repo)
 	} else {
 		repo = memoryrepo.NewInMemory(configuration.FileStoragePath)
-		service.InitRepo(repo)
 	}
+
+	svc := service.NewService(repo)
+
 	t.Run("test POST", func(t *testing.T) {
 		request, _ := http.NewRequest("POST", "/", bytes.NewBuffer([]byte("gopnik.win")))
 		response := httptest.NewRecorder()
-		handler.MakeActionPost(configuration.BasePath)(response, request)
+		handler.MakeActionPost(svc, configuration.BasePath)(response, request)
 		result := response.Result()
 		defer result.Body.Close()
 		if result.StatusCode != http.StatusCreated {
@@ -45,7 +46,7 @@ func TestHandlers(t *testing.T) {
 
 		request, _ := http.NewRequest("GET", "/"+key, nil)
 		response := httptest.NewRecorder()
-		handler.ActionGet(response, request)
+		handler.MakeActionGet(svc)(response, request)
 
 		result := response.Result()
 		defer result.Body.Close()
