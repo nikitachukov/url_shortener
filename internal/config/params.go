@@ -6,10 +6,10 @@ import (
 )
 
 type Params struct {
-	AppAddr         *string
-	BasePath        *string
-	FileStoragePath *string
-	DSN             *string
+	AppAddr         string
+	BasePath        string
+	FileStoragePath string
+	DSN             string
 }
 
 func NewParams() *Params {
@@ -51,10 +51,10 @@ func (p *Params) InitParams() {
 		}
 	}
 
-	p.AppAddr = &AppAddr
-	p.BasePath = &BasePath
-	p.FileStoragePath = &FileStoragePath
-	p.DSN = &DSN
+	p.AppAddr = AppAddr
+	p.BasePath = BasePath
+	p.FileStoragePath = FileStoragePath
+	p.DSN = DSN
 
 	//Если указана переменная окружения, то используется она.
 	//Если нет переменной окружения, но есть аргумент командной строки (флаг), то используется он.

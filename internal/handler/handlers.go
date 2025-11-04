@@ -137,25 +137,34 @@ func MakeActionPostBatchAPI(basePath string) http.HandlerFunc {
 			resData []APIShortenBatchRes
 		)
 
+		res.Header().Set("Content-Type", "application/json")
+
 		err := json.NewDecoder(req.Body).Decode(&reqData)
+
 		if err != nil {
-			http.Error(res, err.Error(), http.StatusBadRequest)
+			logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusBadRequest)
+			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
 		defer req.Body.Close()
 
 		for _, item := range reqData {
-			shortURL, _, _ := service.ShortURL([]byte(item.OriginalURL))
+			shortURL, _, err := service.ShortURL([]byte(item.OriginalURL))
+
+			if err != nil {
+				logger.Log.Sugar().Errorf("Unable to shorten URL: status: %d", http.StatusInternalServerError)
+				res.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
 			if basePath == "" {
-				shortURLFull := fmt.Sprintf("http://%s/%s", req.Host, shortURL)
-				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: shortURLFull})
+				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: fmt.Sprintf("http://%s/%s", req.Host, shortURL)})
 			} else {
-				shortURLFull := fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, resData)
-				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: shortURLFull})
+				resData = append(resData, APIShortenBatchRes{CorrelationID: item.CorrelationID, ShortURL: fmt.Sprintf("http://%s/%s/%s", req.Host, basePath, shortURL)})
 			}
 		}
 
-		res.Header().Set("Content-Type", "application/json")
 		res.WriteHeader(http.StatusCreated)
 
 		_render.JSON(res, req, resData)

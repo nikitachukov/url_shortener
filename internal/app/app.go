@@ -24,10 +24,10 @@ func StartServer() {
 	configuration := config.NewParams()
 	configuration.InitParams()
 
-	if *configuration.DSN != "" {
-		service.InitRepo(dbrepo.NewDB(*configuration.DSN))
+	if configuration.DSN != "" {
+		service.InitRepo(dbrepo.NewDB(configuration.DSN))
 	} else {
-		service.InitRepo(memoryrepo.NewInMemory(*configuration.FileStoragePath))
+		service.InitRepo(memoryrepo.NewInMemory(configuration.FileStoragePath))
 	}
 
 	mux := chi.NewRouter()
@@ -35,19 +35,19 @@ func StartServer() {
 	mux.Use(handler.LoggingHandlersMiddleware)
 	mux.Use(handler.CustomDecompress)
 
-	mux.Post("/", handler.MakeActionPost(*configuration.BasePath))
-	mux.Post("/api/shorten", handler.MakeActionPostAPI(*configuration.BasePath))
-	mux.Post("/api/shorten/batch", handler.MakeActionPostBatchAPI(*configuration.BasePath))
+	mux.Post("/", handler.MakeActionPost(configuration.BasePath))
+	mux.Post("/api/shorten", handler.MakeActionPostAPI(configuration.BasePath))
+	mux.Post("/api/shorten/batch", handler.MakeActionPostBatchAPI(configuration.BasePath))
 
-	if *configuration.BasePath != "" {
-		mux.Get("/"+*configuration.BasePath+"/{short}", handler.ActionGet)
+	if configuration.BasePath != "" {
+		mux.Get("/"+configuration.BasePath+"/{short}", handler.ActionGet)
 	} else {
 		mux.Get("/{short}", handler.ActionGet)
 	}
 
 	mux.Get("/ping", handler.Ping)
 
-	serverPath := *configuration.AppAddr
+	serverPath := configuration.AppAddr
 
 	server := &http.Server{
 		Addr:    serverPath,

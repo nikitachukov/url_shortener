@@ -10,6 +10,8 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
+//Глобальная переменная Repo в service пакете, лучше использовать dependency injection через структуры
+
 const asciiLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const lengthOfCode = 10
 
