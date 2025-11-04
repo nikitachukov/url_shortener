@@ -10,13 +10,15 @@ import (
 	"github.com/nikitachukov/url_shortener.git/internal/repository"
 )
 
+type Service struct {
+	repo repository.ShortenerRepo
+}
+
 const asciiLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const lengthOfCode = 10
 
-var Repo repository.ShortenerRepo
-
-func InitRepo(r repository.ShortenerRepo) {
-	Repo = r
+func NewService(r repository.ShortenerRepo) *Service {
+	return &Service{repo: r}
 }
 
 func generateCode() (string, error) {
@@ -31,7 +33,7 @@ func generateCode() (string, error) {
 	return string(b), nil
 }
 
-func ShortURL(long []byte) (string, bool, error) {
+func (s *Service) ShortURL(long []byte) (string, bool, error) {
 	longStr := strings.TrimSpace(string(long))
 	if longStr == "" {
 		return "", false, fmt.Errorf("empty URL is not allowed")
@@ -40,33 +42,35 @@ func ShortURL(long []byte) (string, bool, error) {
 	var short string
 
 	code, err := generateCode()
-
 	if err != nil {
 		return "", false, fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	if exists := Repo.Set(code, longStr); !exists {
+	if exists := s.repo.Set(code, longStr); !exists {
 		short = code
 		logger.Log.Sugar().Infof("Short url: %s set for long: %s", short, longStr)
 		return short, false, nil
 	} else {
-		short, _ = Repo.FindShortURL(longStr)
+		short, _ = s.repo.FindShortURL(longStr)
 		logger.Log.Sugar().Infof("Short url: %s exsist! long: %s", short, longStr)
 		return short, true, nil
 	}
 }
 
-func GetLongURL(short string) (string, error) {
-	if Repo == nil {
+func (s *Service) GetLongURL(short string) (string, error) {
+	if s == nil || s.repo == nil {
 		return "", fmt.Errorf("repository is not initialized")
 	}
-	long, exists := Repo.GetLongURL(short)
+	long, exists := s.repo.GetLongURL(short)
 	if !exists {
 		return "", fmt.Errorf("short url not found")
 	}
 	return long, nil
 }
 
-func Ping() bool {
-	return Repo.Ping()
+func (s *Service) Ping() bool {
+	if s == nil || s.repo == nil {
+		return false
+	}
+	return s.repo.Ping()
 }
